@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <% layout('layouts/boilerplate') -%>
 
 <h1>All Campgrounds!</h1>
@@ -28,34 +27,3 @@
 	</div>
 </div>
 <% }) %>
-=======
-<% layout('layouts/boilerplate') -%>
-
-<h1>All Campgrounds!</h1>
-
-<% campgrounds.forEach(campground => { %>
-<div class="card mb-3">
-	<div class="row">
-		<div class="col-md-4">
-			<img
-				src="<%= campground.image %>"
-				class="img-fluid"
-				alt="campground image"
-			/>
-		</div>
-		<div class="col-md-8">
-			<div class="card-body">
-				<h5 class="card-title"><%= campground.title %></h5>
-				<p class="card-text"><%= campground.description %></p>
-				<p class="card-text">
-					<small class="text-muted"><%= campground.location %> </small>
-				</p>
-				<a href="/campgrounds/<%= campground._id %>" class="btn btn-primary"
-					>Details</a
-				>
-			</div>
-		</div>
-	</div>
-</div>
-<% }) %>
->>>>>>> 07e9a713fe9425e9d54b09bee418c50b3e3ab6b5
