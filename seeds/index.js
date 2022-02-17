@@ -35,7 +35,7 @@ const getImage = async () => {
 const seedDB = async () => {
 	await Campground.deleteMany({})
 
-	for (let i = 0; i < 50; i++) {
+	for (let i = 0; i < 25; i++) {
 		const randomLocation = Math.floor(Math.random() * 1000)
 		const price = Math.floor(Math.random() * 30 + 10)
 		const image = await getImage()
