@@ -3,9 +3,11 @@ const path = require('path')
 const mongoose = require('mongoose')
 const methodOverride = require('method-override')
 const ejsMate = require('ejs-mate')
+const campgroundSchema = require('./joiSchema')
 const Campground = require('./models/campground')
 const ExpressError = require('./utilities/ExpressError')
 const catchAsync = require('./utilities/catchAsync')
+const joiSchema = require('./joiSchema')
 
 const app = express()
 
@@ -31,6 +33,16 @@ app.get('/', (req, res) => {
 	res.redirect('/campgrounds')
 })
 
+const validateCampground = (req, res, next) => {
+	const { error } = joiSchema.validate(req.body)
+
+	if (error) {
+		const errorMsg = error.details.map(e => e.message).join(', ')
+		throw new ExpressError(400, errorMsg)
+	}
+	next()
+}
+
 // INDEX
 app.get(
 	'/campgrounds',
@@ -48,13 +60,13 @@ app.get('/campgrounds/new', (req, res) => {
 
 app.post(
 	'/campgrounds',
+	validateCampground,
 	catchAsync(async (req, res, next) => {
-		if (!req.body.campground) {
-			throw new ExpressError(400, 'Campground data not valid')
-		}
+		// if (!req.body.campground)
+		// 	throw new ExpressError(400, 'Campground data not valid')
 		const campground = await new Campground({ ...req.body.campground })
 		await campground.save()
-		res.redirect('/campgrounds')
+		res.redirect(`/campgrounds/${campground._id}`)
 	})
 )
 
@@ -78,6 +90,7 @@ app.get(
 
 app.put(
 	'/campgrounds/:id',
+	validateCampground,
 	catchAsync(async (req, res) => {
 		const { id } = req.params
 		await Campground.findByIdAndUpdate(id, { ...req.body.campground })
@@ -101,8 +114,9 @@ app.all('*', (req, res, next) => {
 
 // ERROR HANDLER
 app.use((err, req, res, next) => {
-	const { status = 500, message = 'Something went wrong' } = err
-	res.status(status).send(message)
+	const { status = 500 } = err
+	if (!err.message) err.message = 'Something went wrong! :('
+	res.status(status).render('errorTemplate', { err })
 })
 
 app.listen(3000, () => {
