@@ -3,11 +3,11 @@ const path = require('path')
 const mongoose = require('mongoose')
 const methodOverride = require('method-override')
 const ejsMate = require('ejs-mate')
-const campgroundSchema = require('./joiSchema')
+const { campgroundSchema, reviewSchema } = require('./joiSchema')
 const Campground = require('./models/campground')
+const Review = require('./models/review')
 const ExpressError = require('./utilities/ExpressError')
 const catchAsync = require('./utilities/catchAsync')
-const joiSchema = require('./joiSchema')
 
 const app = express()
 
@@ -34,11 +34,21 @@ app.get('/', (req, res) => {
 })
 
 const validateCampground = (req, res, next) => {
-	const { error } = joiSchema.validate(req.body)
+	const { error } = campgroundSchema.validate(req.body)
 
 	if (error) {
 		const errorMsg = error.details.map(e => e.message).join(', ')
 		throw new ExpressError(400, errorMsg)
+	}
+	next()
+}
+
+const validateReview = (req, res, next) => {
+	const { error } = reviewSchema.validate(req.body)
+
+	if (error) {
+		const errMsg = error.details.map(e => e.message).join(',')
+		throw new ExpressError(400, errMsg)
 	}
 	next()
 }
@@ -108,6 +118,24 @@ app.delete(
 	})
 )
 
+// REVIEWS routes
+app.post(
+	'/campgrounds/:id/reviews',
+	validateReview,
+	catchAsync(async (req, res) => {
+		const { id } = req.params
+		const { rating, body } = req.body.review
+		const campground = await Campground.findById(id)
+		const review = new Review({ rating, body })
+		campground.reviews.push(review)
+
+		await review.save()
+		await campground.save()
+
+		res.redirect(`/campgrounds/${id}`)
+	})
+)
+
 app.all('*', (req, res, next) => {
 	next(new ExpressError(404, 'Page Not Found!'))
 })
@@ -122,9 +150,3 @@ app.use((err, req, res, next) => {
 app.listen(3000, () => {
 	console.log('LISTENING ON PORT 3000')
 })
-
-// Index		✅
-// Create		✅
-// Read 		✅
-// Update 	✅
-// Destroy  ✅
