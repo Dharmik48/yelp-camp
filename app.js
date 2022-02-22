@@ -84,7 +84,9 @@ app.post(
 app.get(
 	'/campgrounds/:id',
 	catchAsync(async (req, res) => {
-		const campground = await Campground.findById(req.params.id)
+		const campground = await Campground.findById(req.params.id).populate(
+			'reviews'
+		)
 		res.render('campgrounds/show.ejs', { campground })
 	})
 )
@@ -132,6 +134,16 @@ app.post(
 		await review.save()
 		await campground.save()
 
+		res.redirect(`/campgrounds/${id}`)
+	})
+)
+
+app.delete(
+	'/campgrounds/:id/reviews/:reviewId',
+	catchAsync(async (req, res) => {
+		const { id, reviewId } = req.params
+		await Review.findByIdAndDelete(reviewId)
+		await Campground.findByIdAndUpdate(id, { $pull: { review: reviewId } })
 		res.redirect(`/campgrounds/${id}`)
 	})
 )
