@@ -38,6 +38,7 @@ router.post(
 		// 	throw new ExpressError(400, 'Campground data not valid')
 		const campground = await new Campground({ ...req.body.campground })
 		await campground.save()
+		req.flash('success', 'Campground Successfully Created')
 		res.redirect(`/campgrounds/${campground._id}`)
 	})
 )
@@ -49,6 +50,10 @@ router.get(
 		const campground = await Campground.findById(req.params.id).populate(
 			'reviews'
 		)
+		if (!campground) {
+			req.flash('error', 'Campground not found!')
+			return res.redirect('/campgrounds')
+		}
 		res.render('campgrounds/show.ejs', { campground })
 	})
 )
@@ -58,6 +63,10 @@ router.get(
 	'/:id/edit',
 	catchAsync(async (req, res) => {
 		const campground = await Campground.findById(req.params.id)
+		if (!campground) {
+			req.flash('error', 'Campground not found!')
+			return res.redirect('/campgrounds')
+		}
 		res.render('campgrounds/edit.ejs', { campground })
 	})
 )
@@ -68,6 +77,7 @@ router.put(
 	catchAsync(async (req, res) => {
 		const { id } = req.params
 		await Campground.findByIdAndUpdate(id, { ...req.body.campground })
+		req.flash('success', 'Campground Successfully Updated!')
 		res.redirect(`/campgrounds/${id}`)
 	})
 )
@@ -78,6 +88,7 @@ router.delete(
 	catchAsync(async (req, res) => {
 		const { id } = req.params
 		await Campground.findByIdAndDelete(id)
+		req.flash('success', 'Campground Successfully Deleted!')
 		res.redirect('/campgrounds')
 	})
 )
