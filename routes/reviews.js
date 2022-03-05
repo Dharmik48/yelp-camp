@@ -5,6 +5,7 @@ const Review = require('../models/review')
 const Campground = require('../models/campground')
 const ExpressError = require('../utilities/ExpressError')
 const catchAsync = require('../utilities/catchAsync')
+const isLoggedIn = require('../middleware')
 
 const validateReview = (req, res, next) => {
 	const { error } = reviewSchema.validate(req.body)
@@ -19,6 +20,7 @@ const validateReview = (req, res, next) => {
 // REVIEWS routes
 router.post(
 	'/',
+	isLoggedIn,
 	validateReview,
 	catchAsync(async (req, res) => {
 		const { id } = req.params
