@@ -8,7 +8,7 @@ const { isLoggedIn, isAuthor, validateCampground } = require('../middleware')
 router.get(
 	'/',
 	catchAsync(async (req, res) => {
-		const campgrounds = await Campground.find({})
+		const campgrounds = await Campground.find({	})
 
 		res.render('campgrounds/index', { campgrounds })
 	})
