@@ -41,7 +41,7 @@ const seedDB = async () => {
 		const image = await getImage()
 
 		const campground = new Campground({
-			author: '62234352b17d225fd5fb02b0',
+			author: '6256567641c652250d2503ff',
 			title: `${generateName(descriptors)} ${generateName(places)}`,
 			location: `${cities[randomLocation].city}, ${cities[randomLocation].state}`,
 			image,

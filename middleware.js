@@ -44,8 +44,9 @@ module.exports.validateReview = (req, res, next) => {
 
 module.exports.isReviewAuthor = async (req, res, next) => {
 	const { id, reviewId } = req.params
+	// console.log(reviewId)
 	const review = await Review.findById(reviewId)
-	if (!review.author.equals(req.user._id)) {
+	if (review && !review.author.equals(req.user._id)) {
 		req.flash('error', 'You cannot do that!')
 		res.redirect(`/campgrounds/${id}`)
 	}
